@@ -4,7 +4,7 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.instabook.client.constant.ApiConstants;
-import com.instabook.client.model.User;
+import com.instabook.client.model.dos.User;
 
 import javax.swing.*;
 import java.awt.*;

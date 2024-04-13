@@ -1,6 +1,7 @@
-package com.instabook.client.model;
+package com.instabook.client.model.dos;
 
 public class User {
+    private Long userId;
 
     private String userName;
 
@@ -10,9 +11,25 @@ public class User {
 
     private String token;
 
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     public String getHeadImg() {
         return headImg;
     }
+
+    public String getHeadImg(int width, int height) {
+        int min = Math.min(width, height);
+        return headImg.concat("?x-oss-process=image/resize,m_mfit,s_" + min + "/crop,w_" + width
+                + ",h_" + height + ",g_center");
+
+    }
+
 
     public void setHeadImg(String headImg) {
         this.headImg = headImg;
