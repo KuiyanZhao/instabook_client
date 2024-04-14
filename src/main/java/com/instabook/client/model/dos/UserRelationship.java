@@ -131,4 +131,8 @@ public class UserRelationship {
         return anotherUserHeadImg.concat("?x-oss-process=image/resize,m_mfit,s_" + min + "/crop,w_" + width
                 + ",h_" + height + ",g_center");
     }
+
+    public String getChatId() {
+        return Math.min(userId, anotherUserId) + "" + Math.max(userId, anotherUserId);
+    }
 }

@@ -81,7 +81,10 @@ public class Message {
     }
 
     public void setContent(String content) {
-        setContent(0, content);
+        if (this.type == null) {
+            this.type = 0;
+        }
+        setContent(this.type, content);
     }
 
     public Long getMessageId() {

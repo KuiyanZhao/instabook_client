@@ -1,5 +1,7 @@
 package com.instabook.client.model.dos;
 
+import com.instabook.client.context.StorageContext;
+
 public class User {
     private Long userId;
 
@@ -57,5 +59,10 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getChatId() {
+        return Math.min(StorageContext.user.getUserId(), userId) + ""
+                + Math.max(StorageContext.user.getUserId(), userId);
     }
 }

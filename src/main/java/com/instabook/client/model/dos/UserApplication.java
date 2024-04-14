@@ -26,6 +26,10 @@ public class UserApplication {
      */
     private Long anotherUserId;
 
+    private String anotherUserName;
+
+    private String anotherUserHeadImg;
+
     /**
      * 0:apply 1:pass -1:disapprove
      */
@@ -78,6 +82,22 @@ public class UserApplication {
         this.anotherUserId = anotherUserId;
     }
 
+    public String getAnotherUserName() {
+        return anotherUserName;
+    }
+
+    public void setAnotherUserName(String anotherUserName) {
+        this.anotherUserName = anotherUserName;
+    }
+
+    public String getAnotherUserHeadImg() {
+        return anotherUserHeadImg;
+    }
+
+    public void setAnotherUserHeadImg(String anotherUserHeadImg) {
+        this.anotherUserHeadImg = anotherUserHeadImg;
+    }
+
     public Integer getStatus() {
         return status;
     }
@@ -106,6 +126,13 @@ public class UserApplication {
         int min = Math.min(width, height);
 
         return userHeadImg.concat("?x-oss-process=image/resize,m_mfit,s_" + min + "/crop,w_" + width
+                + ",h_" + height + ",g_center");
+    }
+
+    public String getAnotherUserHeadImg(int width, int height) {
+        int min = Math.min(width, height);
+
+        return anotherUserHeadImg.concat("?x-oss-process=image/resize,m_mfit,s_" + min + "/crop,w_" + width
                 + ",h_" + height + ",g_center");
     }
 }

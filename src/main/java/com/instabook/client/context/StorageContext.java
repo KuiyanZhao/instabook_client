@@ -2,6 +2,7 @@ package com.instabook.client.context;
 
 import com.instabook.client.frame.ChatFrame;
 import com.instabook.client.frame.MenuFrame;
+import com.instabook.client.frame.UserSearchFrame;
 import com.instabook.client.model.dos.Chat;
 import com.instabook.client.model.dos.User;
 import com.instabook.client.model.dos.UserApplication;
@@ -27,4 +28,6 @@ public class StorageContext {
     public static Map<String, ChatFrame> chatFrameMap;
 
     public static int connectTimes = 0;
+    public static UserSearchFrame userSearchFrame
+            ;
 }

@@ -3,7 +3,7 @@ package com.instabook.client.constant;
 public class ApiConstants {
 
     //    public static String hostAddress = "47.103.205.194:8082";
-    public static String hostAddress = "localhost:8082";
+    public static String hostAddress = "127.0.0.1:8082";
     public static String http = "http://";
 
     public static String ws = "ws://";
@@ -27,6 +27,8 @@ public class ApiConstants {
     public static String applicationPage = httpHost + "/user-application/page";
 
     public static String userRelationshipListUrl = httpHost + "/user-relationship/list";
+
+    public static String userRelationshipUrl = httpHost + "/user-relationship";
 
     public static String userRelationshipOperationUrl = httpHost + "/user-relationship/operate";
 

@@ -1,10 +1,7 @@
 package com.instabook.client.frame;
 
 import com.alibaba.fastjson.JSON;
-import com.instabook.client.component.ChatListCellRender;
-import com.instabook.client.component.ChatListModel;
-import com.instabook.client.component.FriendListCellRender;
-import com.instabook.client.component.FriendListModel;
+import com.instabook.client.component.*;
 import com.instabook.client.constant.ApiConstants;
 import com.instabook.client.context.StorageContext;
 import com.instabook.client.handler.WebSocketHandler;
@@ -151,9 +148,10 @@ public class MenuFrame extends JFrame {
         });
 
         searchUserButton.addActionListener(e -> {
-            // Handle search user button action
-            JOptionPane.showMessageDialog(MenuFrame.this,
-                    "Redirect to User Search page.");
+            if (StorageContext.userSearchFrame == null) {
+                StorageContext.userSearchFrame = new UserSearchFrame();
+            }
+            StorageContext.userSearchFrame.setVisible(true);
         });
 
         friendListButton.addActionListener(e -> {
@@ -164,24 +162,44 @@ public class MenuFrame extends JFrame {
                 if (friendService == null) {
                     friendService = new FriendServiceImpl();
                 }
-                friendService.refreshFiendList();
+                friendService.refreshFriendList();
                 FriendListModel friendListModel = new FriendListModel(StorageContext.friends);
-                friendList = new JList<>(friendListModel) {
-                    @Override
-                    public int locationToIndex(Point location) {
-                        int index = super.locationToIndex(location);
-                        if (index != -1 && !getCellBounds(index, index).contains(location)) {
-                            return -1;
-                        } else {
-                            return index;
-                        }
-                    }
-                };
+                friendList = new JListZ<>();
                 friendList.setCellRenderer(new FriendListCellRender());
                 friendList.setModel(friendListModel);
+                friendList.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getClickCount() == 1) {
+                            int index = friendList.locationToIndex(e.getPoint());
+                            if (index != -1) {
+                                UserRelationship userPicked = friendList.getModel().getElementAt(index);
+                                if (StorageContext.chatFrameMap == null) {
+                                    StorageContext.chatFrameMap = new HashMap<String, ChatFrame>();
+                                }
+                                ChatFrame chatFrame = StorageContext.chatFrameMap.get(userPicked.getChatId());
+                                if (chatFrame == null) {
+                                    Chat chat = new Chat(userPicked);
+                                    chatFrame = new ChatFrame(chat);
+                                    StorageContext.chatFrameMap.put(chat.getChatId(), chatFrame);
+                                    chatFrame.setVisible(true);
+                                } else {
+                                    if (!chatFrame.isVisible()) {
+                                        chatFrame.setVisible(true);
+                                    }
+                                    chatFrame.toFront();
+                                    chatFrame.requestFocus();
+                                }
+                            } else {
+                                friendList.clearSelection();
+                            }
+                        }
+                    }
+                });
                 friendScrollPane = new JScrollPane(friendList);
                 atPane = friendScrollPane;
                 add(friendScrollPane, BorderLayout.CENTER);
+                friendList.repaint();
                 revalidate();
                 repaint();
                 return;
@@ -194,7 +212,7 @@ public class MenuFrame extends JFrame {
                 if (friendService == null) {
                     friendService = new FriendServiceImpl();
                 }
-                friendService.refreshFiendList();
+                friendService.refreshFriendList();
                 friendList.setModel(new FriendListModel(StorageContext.friends));
                 friendScrollPane = new JScrollPane(friendList);
                 atPane = friendScrollPane;
@@ -207,49 +225,83 @@ public class MenuFrame extends JFrame {
                 if (friendService == null) {
                     friendService = new FriendServiceImpl();
                 }
-                friendService.refreshFiendList();
+                friendService.refreshFriendList();
                 friendList.setModel(new FriendListModel(StorageContext.friends));
+                revalidate();
+                repaint();
                 friendList.repaint();
             }
         });
         userApplicationListButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (userApplicationService == null) {
-                    userApplicationService = new UserApplicationServiceImpl();
+                if (userApplicationScrollPane == null) {
+                    remove(atPane);
+                    atPage = "userApplication";
+                    if (userApplicationService == null) {
+                        userApplicationService = new UserApplicationServiceImpl();
+                    }
+                    userApplicationService.refreshUserApplicationList();
+                    UserApplicationListModel userApplicationListModel = new UserApplicationListModel(StorageContext
+                            .userApplications);
+                    userApplicationList = new JListZ<>();
+                    userApplicationList.setCellRenderer(new UserApplicationListCellRender());
+                    userApplicationList.setModel(userApplicationListModel);
+                    userApplicationList.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            if (e.getClickCount() == 1) {
+                                int index = userApplicationList.locationToIndex(e.getPoint());
+                                if (index != -1) {
+                                    UserApplication userApplicationPicked = userApplicationList.getModel()
+                                            .getElementAt(index);
+                                    new UserApplicationDetailFrame(userApplicationPicked);
+                                } else {
+                                    userApplicationList.clearSelection();
+                                }
+                            }
+                        }
+                    });
+                    userApplicationScrollPane = new JScrollPane(userApplicationList);
+                    atPane = userApplicationScrollPane;
+                    add(userApplicationScrollPane, BorderLayout.CENTER);
+                    userApplicationList.repaint();
+                    revalidate();
+                    repaint();
+                    return;
                 }
-                userApplicationService.refreshUserApplicationList();
+
+                if (!Objects.equals(atPage, "userApplication")) {
+                    atPage = "userApplication";
+                    remove(atPane);
+                    //refresh userApplication list
+                    if (userApplicationService == null) {
+                        userApplicationService = new UserApplicationServiceImpl();
+                    }
+                    userApplicationService.refreshUserApplicationList();
+                    userApplicationList.setModel(new UserApplicationListModel(StorageContext.userApplications));
+                    userApplicationScrollPane = new JScrollPane(userApplicationList);
+                    atPane = userApplicationScrollPane;
+                    add(userApplicationScrollPane, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
+                    userApplicationList.repaint();
+                } else {
+                    //refresh userApplication list
+                    if (userApplicationService == null) {
+                        userApplicationService = new UserApplicationServiceImpl();
+                    }
+                    userApplicationService.refreshUserApplicationList();
+                    userApplicationList.setModel(new UserApplicationListModel(StorageContext.userApplications));
+                    revalidate();
+                    repaint();
+                    userApplicationList.repaint();
+                }
             }
         });
 
-        chatList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1) {
-                    int index = chatList.locationToIndex(e.getPoint());
-                    if (index != -1) {
-                        Chat clickedChat = chatList.getModel().getElementAt(index);
-                        if (StorageContext.chatFrameMap == null) {
-                            StorageContext.chatFrameMap = new HashMap<String, ChatFrame>();
-                        }
-                        ChatFrame chatFrame = StorageContext.chatFrameMap.get(clickedChat.getChatId());
-                        if (chatFrame == null) {
-                            chatFrame = new ChatFrame(clickedChat);
-                            StorageContext.chatFrameMap.put(clickedChat.getChatId(), chatFrame);
-                            chatFrame.setVisible(true);
-                        } else {
-                            if (!chatFrame.isVisible()) {
-                                chatFrame.setVisible(true);
-                            }
-                            chatFrame.toFront();
-                            chatFrame.requestFocus();
-                        }
-                    } else {
-                        chatList.clearSelection();
-                    }
-                }
-            }
-        });
+
+
     }
 
     public void connectWebSocket(long waitTime) {
@@ -280,20 +332,38 @@ public class MenuFrame extends JFrame {
         List<Chat> chats = messageService.getChats();
         ChatListModel chatListModel = new ChatListModel(chats);
         if (chatList == null) {
-            chatList = new JList<>(chatListModel) {
-                @Override
-                public int locationToIndex(Point location) {
-                    int index = super.locationToIndex(location);
-                    if (index != -1 && !getCellBounds(index, index).contains(location)) {
-                        return -1;
-                    } else {
-                        return index;
-                    }
-                }
-            };
+            chatList = new JListZ<>();
             chatList.setFont(new Font(Font.SERIF, Font.PLAIN, 18));
             chatList.setCellRenderer(new ChatListCellRender());
             chatList.setModel(chatListModel);
+            chatList.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 1) {
+                        int index = chatList.locationToIndex(e.getPoint());
+                        if (index != -1) {
+                            Chat clickedChat = chatList.getModel().getElementAt(index);
+                            if (StorageContext.chatFrameMap == null) {
+                                StorageContext.chatFrameMap = new HashMap<String, ChatFrame>();
+                            }
+                            ChatFrame chatFrame = StorageContext.chatFrameMap.get(clickedChat.getChatId());
+                            if (chatFrame == null) {
+                                chatFrame = new ChatFrame(clickedChat);
+                                StorageContext.chatFrameMap.put(clickedChat.getChatId(), chatFrame);
+                                chatFrame.setVisible(true);
+                            } else {
+                                if (!chatFrame.isVisible()) {
+                                    chatFrame.setVisible(true);
+                                }
+                                chatFrame.toFront();
+                                chatFrame.requestFocus();
+                            }
+                        } else {
+                            chatList.clearSelection();
+                        }
+                    }
+                }
+            });
             atPage = "chat";
             chatScrollPane = new JScrollPane(chatList);
             atPane = chatScrollPane;
@@ -301,6 +371,8 @@ public class MenuFrame extends JFrame {
         } else {
             chatList.setModel(chatListModel);
             if (Objects.equals(atPage, "chat")) {
+                revalidate();
+                repaint();
                 chatList.repaint();
             }
         }

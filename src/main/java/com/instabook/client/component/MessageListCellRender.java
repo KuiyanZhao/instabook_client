@@ -42,9 +42,12 @@ public class MessageListCellRender extends JLabel implements ListCellRenderer<Me
             setText(content.toString());
         } else {
             if (type == 1) {
-                content = new StringBuilder("[picture]");
-                String text = "<html>" + message.getUserName() + "<br/>" +
-                        content + ((message.getDone() == null) ? "⌛" : "") + " <html/>";
+                setBorder(new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+                String usernameHtml = "<div style='margin-bottom: -15;text-align: " + (left ? "left" : "right")
+                        + ";'>" + message.getUserName() + "</div>";
+                String text = "<html>" + usernameHtml + "<br/><img src=\"" + content +
+                        "?x-oss-process=image/resize,m_mfit,s_100\">"
+                        + ((message.getDone() == null) ? "⌛" : "") + " <html/>";
                 setText(text);
                 try {
                     URL headImgUrl = new URL(message.getUserHeadImg(50, 50));
