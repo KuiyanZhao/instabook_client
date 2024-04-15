@@ -51,9 +51,10 @@ public class LoginFrame extends JFrame {
             String password = new String(passwordField.getPassword());
 
             User user = registerUser(username, password);
-
-            jumpMenuFrame(user);
-
+            if (user != null) {
+                user.setHeadImg("https://chat-bucket-demo.oss-cn-shanghai.aliyuncs.com/default_head_img.jpg");
+                jumpMenuFrame(user);
+            }
         });
 
         panel.add(usernameLabel);
