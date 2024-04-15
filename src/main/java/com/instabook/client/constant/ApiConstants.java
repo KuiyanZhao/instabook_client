@@ -18,6 +18,8 @@ public class ApiConstants {
 
     public static String userListUrl = httpHost + "/user/search";
 
+    public static String userHeadImgUrl = httpHost + "/user/profile";
+
     public static String profileUrl = httpHost + "/user/profile";
 
     public static String applyFriendUrl = httpHost + "/user-application/apply";
@@ -33,6 +35,8 @@ public class ApiConstants {
     public static String userRelationshipOperationUrl = httpHost + "/user-relationship/operate";
 
     public static String messageSendingUrl = httpHost + "/message";
+
+    public static String uploadImageMessageUrl = httpHost + "/file/message";
 
     public static String chatPageUrl = httpHost + "/message/chat/page";
 

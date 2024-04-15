@@ -7,4 +7,6 @@ public interface FriendService {
     void refreshFriendList();
 
     UserRelationship getRelationship(Long userId);
+
+    UserRelationship operate(Long anotherUserId, int operate);
 }

@@ -1,5 +1,6 @@
 package com.instabook.client.service.impl;
 
+import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.instabook.client.constant.ApiConstants;
@@ -8,8 +9,10 @@ import com.instabook.client.handler.FormatResponseHandler;
 import com.instabook.client.model.Page;
 import com.instabook.client.model.dos.Chat;
 import com.instabook.client.model.dos.Message;
+import com.instabook.client.model.dos.MessageFile;
 import com.instabook.client.service.MessageService;
 
+import java.io.File;
 import java.util.List;
 
 public class MessageServiceImpl implements MessageService {
@@ -36,6 +39,26 @@ public class MessageServiceImpl implements MessageService {
                 return null;
             }
             return messages.getRecords();
+        }
+    }
+
+    @Override
+    public MessageFile uploadImageMessage(File selectedFile, String requestId) {
+        try (HttpResponse response = HttpRequest.post(ApiConstants.uploadImageMessageUrl + "/" + requestId)
+                .form("file", selectedFile)
+                .header("Authorization", StorageContext.user.getToken())
+                .execute()) {
+            return FormatResponseHandler.handleResponse(response.body(), MessageFile.class);
+        }
+    }
+
+    @Override
+    public Message deleteMessage(Message messagePicked) {
+        try (HttpResponse response = HttpRequest.delete(ApiConstants.delMessageUrl +
+                        "/" + messagePicked.getMessageId())
+                .header("Authorization", StorageContext.user.getToken())
+                .execute()) {
+            return FormatResponseHandler.handleResponse(response.body(), Message.class);
         }
     }
 }

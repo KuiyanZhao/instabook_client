@@ -1,5 +1,6 @@
 package com.instabook.client.service.impl;
 
+import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.instabook.client.constant.ApiConstants;
@@ -8,6 +9,7 @@ import com.instabook.client.handler.FormatResponseHandler;
 import com.instabook.client.model.dos.User;
 import com.instabook.client.service.UserService;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,16 @@ public class UserServiceImpl implements UserService {
                 .header("Authorization", StorageContext.user.getToken())
                 .execute()) {
             return FormatResponseHandler.handleListResponse(response.body(), User.class);
+        }
+    }
+
+    @Override
+    public User uploadHeadImg(File selectedFile) {
+        try (HttpResponse response = HttpRequest.put(ApiConstants.userHeadImgUrl)
+                .form("file", selectedFile)
+                .header("Authorization", StorageContext.user.getToken())
+                .execute()) {
+            return FormatResponseHandler.handleResponse(response.body(), User.class);
         }
     }
 }

@@ -119,8 +119,7 @@ public class MenuFrame extends JFrame {
         profilePicLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JOptionPane.showMessageDialog(MenuFrame.this,
-                        "Redirect to headImg page.");
+                new AvatarFrame(StorageContext.user);
             }
         });
 
@@ -174,21 +173,26 @@ public class MenuFrame extends JFrame {
                             int index = friendList.locationToIndex(e.getPoint());
                             if (index != -1) {
                                 UserRelationship userPicked = friendList.getModel().getElementAt(index);
-                                if (StorageContext.chatFrameMap == null) {
-                                    StorageContext.chatFrameMap = new HashMap<String, ChatFrame>();
-                                }
-                                ChatFrame chatFrame = StorageContext.chatFrameMap.get(userPicked.getChatId());
-                                if (chatFrame == null) {
-                                    Chat chat = new Chat(userPicked);
-                                    chatFrame = new ChatFrame(chat);
-                                    StorageContext.chatFrameMap.put(chat.getChatId(), chatFrame);
-                                    chatFrame.setVisible(true);
-                                } else {
-                                    if (!chatFrame.isVisible()) {
-                                        chatFrame.setVisible(true);
+                                if (SwingUtilities.isLeftMouseButton(e)) {
+                                    if (StorageContext.chatFrameMap == null) {
+                                        StorageContext.chatFrameMap = new HashMap<String, ChatFrame>();
                                     }
-                                    chatFrame.toFront();
-                                    chatFrame.requestFocus();
+                                    ChatFrame chatFrame = StorageContext.chatFrameMap.get(userPicked.getChatId());
+                                    if (chatFrame == null) {
+                                        Chat chat = new Chat(userPicked);
+                                        chatFrame = new ChatFrame(chat);
+                                        StorageContext.chatFrameMap.put(chat.getChatId(), chatFrame);
+                                        chatFrame.setVisible(true);
+                                    } else {
+                                        if (!chatFrame.isVisible()) {
+                                            chatFrame.setVisible(true);
+                                        }
+                                        chatFrame.setExtendedState(JFrame.NORMAL);
+                                        chatFrame.toFront();
+                                        chatFrame.requestFocus();
+                                    }
+                                } else {
+                                    new UserOperationFrame(userPicked);
                                 }
                             } else {
                                 friendList.clearSelection();
@@ -355,6 +359,7 @@ public class MenuFrame extends JFrame {
                                 if (!chatFrame.isVisible()) {
                                     chatFrame.setVisible(true);
                                 }
+                                chatFrame.setExtendedState(JFrame.NORMAL);
                                 chatFrame.toFront();
                                 chatFrame.requestFocus();
                             }
@@ -388,5 +393,35 @@ public class MenuFrame extends JFrame {
 
     public void sendMessage(Message message) {
         webSocket.send(JSON.toJSONString(message));
+    }
+
+    public void refreshHeadImg() {
+        URL url = null;
+        try {
+            url = new URL(StorageContext.user.getHeadImg(50, 50));
+            profilePicLabel.setIcon(new ImageIcon(url));
+            profilePicLabel.repaint();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void refreshFriendList() {
+        if (Objects.equals(atPage, "friend")) {
+            atPage = "friend";
+            remove(atPane);
+            //refresh friend list
+            if (friendService == null) {
+                friendService = new FriendServiceImpl();
+            }
+            friendService.refreshFriendList();
+            friendList.setModel(new FriendListModel(StorageContext.friends));
+            friendScrollPane = new JScrollPane(friendList);
+            atPane = friendScrollPane;
+            add(friendScrollPane, BorderLayout.CENTER);
+            revalidate();
+            repaint();
+            friendList.repaint();
+        }
     }
 }

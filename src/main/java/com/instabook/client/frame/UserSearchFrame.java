@@ -1,5 +1,6 @@
 package com.instabook.client.frame;
 
+import com.instabook.client.component.JListZ;
 import com.instabook.client.component.UserListCellRender;
 import com.instabook.client.component.UserListModel;
 import com.instabook.client.model.dos.User;
@@ -51,17 +52,7 @@ public class UserSearchFrame extends JFrame {
         add(searchPanel, BorderLayout.NORTH);
 
         // 创建用户列表
-        userList = new JList<>() {
-            @Override
-            public int locationToIndex(Point location) {
-                int index = super.locationToIndex(location);
-                if (index != -1 && !getCellBounds(index, index).contains(location)) {
-                    return -1;
-                } else {
-                    return index;
-                }
-            }
-        };
+        userList = new JListZ<>();
         userList.setCellRenderer(new UserListCellRender());
         userList.setModel(new UserListModel(users));
         userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -70,7 +61,7 @@ public class UserSearchFrame extends JFrame {
         userList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
+                if (e.getClickCount() >= 1) {
                     int index = userList.locationToIndex(e.getPoint());
                     if (index != -1) {
                         User user = users.get(index);
