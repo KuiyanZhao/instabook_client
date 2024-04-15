@@ -2,8 +2,8 @@ package com.instabook.client.constant;
 
 public class ApiConstants {
 
-    //    public static String hostAddress = "47.103.205.194:8082";
-    public static String hostAddress = "127.0.0.1:8082";
+        public static String hostAddress = "47.103.205.194:8082";
+//    public static String hostAddress = "127.0.0.1:8082";
     public static String http = "http://";
 
     public static String ws = "ws://";
